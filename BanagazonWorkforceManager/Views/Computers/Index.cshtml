@@ -1,0 +1,47 @@
+@model IEnumerable<BanagazonWorkforceManager.Models.Computer>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Make)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Manufacturer)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DatePurchased)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Make)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DatePurchased)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ComputerID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ComputerID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ComputerID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
