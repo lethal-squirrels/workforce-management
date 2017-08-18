@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -9,9 +8,10 @@ using BanagazonWorkforceManager.Models;
 namespace BanagazonWorkforceManager.Migrations
 {
     [DbContext(typeof(BanagazonWorkforceManagerContext))]
-    partial class BanagazonWorkforceManagerContextModelSnapshot : ModelSnapshot
+    [Migration("20170818180856_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
