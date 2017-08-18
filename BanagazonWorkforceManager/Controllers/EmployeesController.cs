@@ -27,15 +27,19 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Employees/Details/5
+        //Creates an object with all the info we wish to display in the employee view
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+            //does an async get of employee info
+            //includes employees department and computer
             var employee = await _context.Employee
                 .Include(e => e.Department)
                 .Include("EmployeeComputers.Computer")
+                .Include("EmployeeTrainingPrograms.TrainingProgram")
                 .SingleOrDefaultAsync(m => m.EmployeeID == id);
 
        
@@ -45,6 +49,7 @@ namespace BanagazonWorkforceManager.Controllers
                 return NotFound();
             }
 
+            //passes the newly created employee object to our view
             return View(employee);
         }
 

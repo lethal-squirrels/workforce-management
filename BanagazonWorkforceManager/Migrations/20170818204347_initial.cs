@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace BanagazonWorkforceManager.Migrations
 {
-    public partial class employeecomputerupdate : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -64,7 +64,8 @@ namespace BanagazonWorkforceManager.Migrations
                     DepartmentID = table.Column<int>(nullable: false),
                     FirstName = table.Column<string>(maxLength: 20, nullable: false),
                     LastName = table.Column<string>(maxLength: 40, nullable: false),
-                    StartDate = table.Column<DateTime>(nullable: false)
+                    StartDate = table.Column<DateTime>(nullable: false),
+                    TrainingProgramID = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -81,6 +82,12 @@ namespace BanagazonWorkforceManager.Migrations
                         principalTable: "Department",
                         principalColumn: "DepartmentID",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Employee_TrainingProgram_TrainingProgramID",
+                        column: x => x.TrainingProgramID,
+                        principalTable: "TrainingProgram",
+                        principalColumn: "TrainingProgramID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -149,6 +156,11 @@ namespace BanagazonWorkforceManager.Migrations
                 column: "DepartmentID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Employee_TrainingProgramID",
+                table: "Employee",
+                column: "TrainingProgramID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmployeeComputer_ComputerID",
                 table: "EmployeeComputer",
                 column: "ComputerID");
@@ -181,13 +193,13 @@ namespace BanagazonWorkforceManager.Migrations
                 name: "Employee");
 
             migrationBuilder.DropTable(
-                name: "TrainingProgram");
-
-            migrationBuilder.DropTable(
                 name: "Computer");
 
             migrationBuilder.DropTable(
                 name: "Department");
+
+            migrationBuilder.DropTable(
+                name: "TrainingProgram");
         }
     }
 }

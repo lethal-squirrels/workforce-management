@@ -8,8 +8,8 @@ using BanagazonWorkforceManager.Models;
 namespace BanagazonWorkforceManager.Migrations
 {
     [DbContext(typeof(BanagazonWorkforceManagerContext))]
-    [Migration("20170818191229_employeecomputerupdate")]
-    partial class employeecomputerupdate
+    [Migration("20170818204347_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -67,11 +67,15 @@ namespace BanagazonWorkforceManager.Migrations
 
                     b.Property<DateTime>("StartDate");
 
+                    b.Property<int?>("TrainingProgramID");
+
                     b.HasKey("EmployeeID");
 
                     b.HasIndex("ComputerID");
 
                     b.HasIndex("DepartmentID");
+
+                    b.HasIndex("TrainingProgramID");
 
                     b.ToTable("Employee");
                 });
@@ -152,6 +156,10 @@ namespace BanagazonWorkforceManager.Migrations
                         .WithMany()
                         .HasForeignKey("DepartmentID")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BanagazonWorkforceManager.Models.TrainingProgram", "TrainingProgram")
+                        .WithMany()
+                        .HasForeignKey("TrainingProgramID");
                 });
 
             modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeComputer", b =>
@@ -175,7 +183,7 @@ namespace BanagazonWorkforceManager.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BanagazonWorkforceManager.Models.TrainingProgram", "TrainingProgram")
-                        .WithMany()
+                        .WithMany("EmployeeTrainingPrograms")
                         .HasForeignKey("TrainingProgramID");
                 });
         }

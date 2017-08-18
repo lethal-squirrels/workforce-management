@@ -19,6 +19,7 @@ namespace BanagazonWorkforceManager.Models
         [DataType(DataType.Date)]
         public DateTime DatePurchased { get; set; }
 
+        //for info from join tables - need virtual icollection WITH a {get; set;}
         public virtual ICollection<EmployeeComputer> EmployeeComputers { get; set; }
     }
 }
