@@ -38,7 +38,14 @@
             @Html.DisplayNameFor(model => model.EmployeeComputers)
         </dt>
         <dd>
-           @Html.DisplayFor(model => model.Computer.Make)
+           @foreach (var item in Model.EmployeeComputers)
+           {
+               @if (item.DateUnassigned == null)
+               {
+
+               @Html.DisplayFor(Model => item.Computer.Make)
+               }
+           }
         </dd>
     </dl>
 </div>

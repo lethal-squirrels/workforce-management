@@ -35,11 +35,10 @@ namespace BanagazonWorkforceManager.Controllers
             }
             var employee = await _context.Employee
                 .Include(e => e.Department)
-                
-
+                .Include("EmployeeComputers.Computer")
                 .SingleOrDefaultAsync(m => m.EmployeeID == id);
 
-          
+       
 
             if (employee == null)
             {

@@ -19,6 +19,6 @@ namespace BanagazonWorkforceManager.Models
         [DataType(DataType.Date)]
         public DateTime DatePurchased { get; set; }
 
-        public ICollection<EmployeeComputer> EmployeeComputers;
+        public virtual ICollection<EmployeeComputer> EmployeeComputers { get; set; }
     }
 }

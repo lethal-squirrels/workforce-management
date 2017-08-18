@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -53,6 +52,8 @@ namespace BanagazonWorkforceManager.Migrations
                     b.Property<int>("EmployeeID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int?>("ComputerID");
+
                     b.Property<int>("DepartmentID");
 
                     b.Property<string>("FirstName")
@@ -66,6 +67,8 @@ namespace BanagazonWorkforceManager.Migrations
                     b.Property<DateTime>("StartDate");
 
                     b.HasKey("EmployeeID");
+
+                    b.HasIndex("ComputerID");
 
                     b.HasIndex("DepartmentID");
 
@@ -140,6 +143,10 @@ namespace BanagazonWorkforceManager.Migrations
 
             modelBuilder.Entity("BanagazonWorkforceManager.Models.Employee", b =>
                 {
+                    b.HasOne("BanagazonWorkforceManager.Models.Computer", "Computer")
+                        .WithMany()
+                        .HasForeignKey("ComputerID");
+
                     b.HasOne("BanagazonWorkforceManager.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentID")
@@ -149,12 +156,12 @@ namespace BanagazonWorkforceManager.Migrations
             modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeComputer", b =>
                 {
                     b.HasOne("BanagazonWorkforceManager.Models.Computer", "Computer")
-                        .WithMany()
+                        .WithMany("EmployeeComputers")
                         .HasForeignKey("ComputerID")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BanagazonWorkforceManager.Models.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("EmployeeComputers")
                         .HasForeignKey("EmployeeID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -162,7 +169,7 @@ namespace BanagazonWorkforceManager.Migrations
             modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeTraining", b =>
                 {
                     b.HasOne("BanagazonWorkforceManager.Models.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("EmployeeTrainingPrograms")
                         .HasForeignKey("EmployeeID")
                         .OnDelete(DeleteBehavior.Cascade);
 

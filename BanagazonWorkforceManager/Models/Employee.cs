@@ -33,8 +33,8 @@ namespace BanagazonWorkforceManager.Models
         public Computer Computer { get; set; }
 
         [Display(Name = "Computer")]
-        public ICollection<EmployeeComputer> EmployeeComputers;
+        public virtual ICollection<EmployeeComputer> EmployeeComputers { get; set; }
 
-        public ICollection<EmployeeTraining> EmployeeTrainingPrograms;
+        public virtual ICollection<EmployeeTraining> EmployeeTrainingPrograms { get; set; }
     }
 }
