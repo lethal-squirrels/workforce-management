@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+//Creates a model for an employee with all revelant information
 namespace BanagazonWorkforceManager.Models
 {
     public class Employee
@@ -32,9 +34,13 @@ namespace BanagazonWorkforceManager.Models
 
         public Computer Computer { get; set; }
 
-        [Display(Name = "Computer")]
-        public ICollection<EmployeeComputer> EmployeeComputers;
+        public TrainingProgram TrainingProgram { get; set; }
 
-        public ICollection<EmployeeTraining> EmployeeTrainingPrograms;
+        //for info from join tables - need virtual icollection WITH a {get; set;}
+        [Display(Name = "Computer")]
+        public virtual ICollection<EmployeeComputer> EmployeeComputers { get; set; }
+
+        [Display(Name = "Training Programs")]
+        public virtual ICollection<EmployeeTraining> EmployeeTrainingPrograms { get; set; }
     }
 }

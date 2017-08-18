@@ -13,9 +13,9 @@ namespace BanagazonWorkforceManager.Models
         [Required]
         public int TrainingID { get; set; }
 
-        public Employee Employee { get; set; }
+        public virtual Employee Employee { get; set; }
 
-        public TrainingProgram TrainingProgram { get; set; }
+        public virtual TrainingProgram TrainingProgram { get; set; }
 
 
     }

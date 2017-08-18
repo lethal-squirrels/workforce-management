@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BanagazonWorkforceManager.Models
@@ -14,9 +15,9 @@ namespace BanagazonWorkforceManager.Models
         [Required]
         public int ComputerID { get; set; }
 
-        public Employee Employee { get; set; }
+        public virtual Employee Employee { get; set; }
 
-        public Computer Computer { get; set; }
+        public virtual Computer Computer { get; set; }
 
         [Required]
         [DataType(DataType.Date)]

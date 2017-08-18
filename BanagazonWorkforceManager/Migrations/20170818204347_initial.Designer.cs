@@ -8,7 +8,7 @@ using BanagazonWorkforceManager.Models;
 namespace BanagazonWorkforceManager.Migrations
 {
     [DbContext(typeof(BanagazonWorkforceManagerContext))]
-    [Migration("20170818142856_initial")]
+    [Migration("20170818204347_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,8 @@ namespace BanagazonWorkforceManager.Migrations
                     b.Property<int>("EmployeeID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int?>("ComputerID");
+
                     b.Property<int>("DepartmentID");
 
                     b.Property<string>("FirstName")
@@ -65,11 +67,59 @@ namespace BanagazonWorkforceManager.Migrations
 
                     b.Property<DateTime>("StartDate");
 
+                    b.Property<int?>("TrainingProgramID");
+
                     b.HasKey("EmployeeID");
+
+                    b.HasIndex("ComputerID");
 
                     b.HasIndex("DepartmentID");
 
+                    b.HasIndex("TrainingProgramID");
+
                     b.ToTable("Employee");
+                });
+
+            modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeComputer", b =>
+                {
+                    b.Property<int>("EmployeeComputerID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ComputerID");
+
+                    b.Property<DateTime>("DateAssigned");
+
+                    b.Property<DateTime?>("DateUnassigned");
+
+                    b.Property<int>("EmployeeID");
+
+                    b.HasKey("EmployeeComputerID");
+
+                    b.HasIndex("ComputerID");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.ToTable("EmployeeComputer");
+                });
+
+            modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeTraining", b =>
+                {
+                    b.Property<int>("EmployeeTrainingID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("EmployeeID");
+
+                    b.Property<int>("TrainingID");
+
+                    b.Property<int?>("TrainingProgramID");
+
+                    b.HasKey("EmployeeTrainingID");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.HasIndex("TrainingProgramID");
+
+                    b.ToTable("EmployeeTraining");
                 });
 
             modelBuilder.Entity("BanagazonWorkforceManager.Models.TrainingProgram", b =>
@@ -98,10 +148,43 @@ namespace BanagazonWorkforceManager.Migrations
 
             modelBuilder.Entity("BanagazonWorkforceManager.Models.Employee", b =>
                 {
+                    b.HasOne("BanagazonWorkforceManager.Models.Computer", "Computer")
+                        .WithMany()
+                        .HasForeignKey("ComputerID");
+
                     b.HasOne("BanagazonWorkforceManager.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentID")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BanagazonWorkforceManager.Models.TrainingProgram", "TrainingProgram")
+                        .WithMany()
+                        .HasForeignKey("TrainingProgramID");
+                });
+
+            modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeComputer", b =>
+                {
+                    b.HasOne("BanagazonWorkforceManager.Models.Computer", "Computer")
+                        .WithMany("EmployeeComputers")
+                        .HasForeignKey("ComputerID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BanagazonWorkforceManager.Models.Employee", "Employee")
+                        .WithMany("EmployeeComputers")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("BanagazonWorkforceManager.Models.EmployeeTraining", b =>
+                {
+                    b.HasOne("BanagazonWorkforceManager.Models.Employee", "Employee")
+                        .WithMany("EmployeeTrainingPrograms")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BanagazonWorkforceManager.Models.TrainingProgram", "TrainingProgram")
+                        .WithMany("EmployeeTrainingPrograms")
+                        .HasForeignKey("TrainingProgramID");
                 });
         }
     }

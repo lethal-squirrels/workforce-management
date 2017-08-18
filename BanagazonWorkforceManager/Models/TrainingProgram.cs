@@ -28,6 +28,6 @@ namespace BanagazonWorkforceManager.Models
         [Required]
         public int MaxAttendees { get; set; }
 
-        public ICollection<EmployeeTraining> EmployeeTrainingPrograms;
+        public virtual ICollection<EmployeeTraining> EmployeeTrainingPrograms { get; set; }
     }
 }
