@@ -13,10 +13,12 @@ namespace BanagazonWorkforceManager.Models
 
         [Required]
         [StringLength(20)]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
         [StringLength(40)]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
         [Required]
@@ -28,6 +30,9 @@ namespace BanagazonWorkforceManager.Models
 
         public Department Department { get; set; }
 
+        public Computer Computer { get; set; }
+
+        [Display(Name = "Computer")]
         public ICollection<EmployeeComputer> EmployeeComputers;
 
         public ICollection<EmployeeTraining> EmployeeTrainingPrograms;

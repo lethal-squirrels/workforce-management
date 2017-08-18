@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BanagazonWorkforceManager.Models;
+using BanagazonWorkforceManager.ViewModels;
 
 namespace BanagazonWorkforceManager.Controllers
 {
@@ -32,10 +33,14 @@ namespace BanagazonWorkforceManager.Controllers
             {
                 return NotFound();
             }
-
             var employee = await _context.Employee
                 .Include(e => e.Department)
+                
+
                 .SingleOrDefaultAsync(m => m.EmployeeID == id);
+
+          
+
             if (employee == null)
             {
                 return NotFound();
