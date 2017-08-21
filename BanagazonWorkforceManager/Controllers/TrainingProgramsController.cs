@@ -49,7 +49,8 @@ namespace BanagazonWorkforceManager.Controllers
             foreach (EmployeeTraining employee in trainingProgram.EmployeeTrainingPrograms)
             {
                 //employeeInTraining.Add(employee.Employee);
-                Console.WriteLine(employee.Employee.FirstName);
+                System.Diagnostics.Debug.WriteLine("COOL BEANS");
+                System.Diagnostics.Debug.WriteLine(employee.Employee.FirstName);
             }
 
             
