@@ -49,9 +49,7 @@
                 @Html.DisplayFor(modelItem => item.MaxAttendees)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.TrainingProgramID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TrainingProgramID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TrainingProgramID">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.TrainingProgramID">Details</a>
             </td>
         </tr>
 }
