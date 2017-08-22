@@ -382,79 +382,79 @@ namespace BanagazonWorkforceManager.Data
                 {
                     new EmployeeTraining {
                         EmployeeID = 1,
-                        TrainingID = 1
+                        TrainingProgramID = 1
                     },
                     new EmployeeTraining {
                         EmployeeID = 2,
-                        TrainingID = 1
+                        TrainingProgramID = 1
                     },
                     new EmployeeTraining {
                         EmployeeID = 3,
-                        TrainingID = 1
+                        TrainingProgramID = 1
                     },
                     new EmployeeTraining {
                         EmployeeID = 4,
-                        TrainingID = 2
+                        TrainingProgramID = 2
                     },
                     new EmployeeTraining {
                         EmployeeID = 5,
-                        TrainingID = 2
+                        TrainingProgramID = 2
                     },
                     new EmployeeTraining {
                         EmployeeID = 6,
-                        TrainingID = 2
+                        TrainingProgramID = 2
                     },
                     new EmployeeTraining {
                         EmployeeID = 7,
-                        TrainingID = 4
+                         TrainingProgramID = 4
                     },
                     new EmployeeTraining {
                         EmployeeID = 8,
-                        TrainingID = 4
+                        TrainingProgramID = 4
                     },
                     new EmployeeTraining {
                         EmployeeID = 9,
-                        TrainingID = 4
+                        TrainingProgramID = 4
                     },
                     new EmployeeTraining {
                         EmployeeID = 7,
-                        TrainingID = 5
+                        TrainingProgramID = 5
                     },
                     new EmployeeTraining {
                         EmployeeID = 8,
-                        TrainingID = 5
+                        TrainingProgramID = 5
                     },
                     new EmployeeTraining {
                         EmployeeID = 9,
-                        TrainingID = 5
+                        TrainingProgramID = 5
                     },
                     new EmployeeTraining {
                         EmployeeID = 7,
-                        TrainingID = 6
+                        TrainingProgramID = 6
                     },
                     new EmployeeTraining {
                         EmployeeID = 9,
-                        TrainingID = 6
+                        TrainingProgramID = 6
                     },
                     new EmployeeTraining {
                         EmployeeID = 9,
-                        TrainingID = 2
+                        TrainingProgramID = 2
                     },
                     new EmployeeTraining {
                         EmployeeID = 9,
-                        TrainingID = 3
+                        TrainingProgramID = 3
                     },
                     new EmployeeTraining {
                         EmployeeID = 10,
-                        TrainingID = 6
+                        TrainingProgramID = 6
                     },
                     new EmployeeTraining {
                         EmployeeID = 8,
-                        TrainingID = 6
+                        TrainingProgramID = 6
                     },
                     new EmployeeTraining {
                         EmployeeID = 11,
-                        TrainingID = 4
+                        TrainingProgramID = 4
                     }
                 };
                 // Adds each new EmployeeTraining into the context

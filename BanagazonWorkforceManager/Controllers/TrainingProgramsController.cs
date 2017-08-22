@@ -42,7 +42,10 @@ namespace BanagazonWorkforceManager.Controllers
             }
 
             var trainingProgram = await _context.TrainingProgram
+                .Include("EmployeeTrainingPrograms.Employee")
                 .SingleOrDefaultAsync(m => m.TrainingProgramID == id);
+
+            
             if (trainingProgram == null)
             {
                 return NotFound();
