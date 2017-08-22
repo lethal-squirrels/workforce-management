@@ -33,6 +33,7 @@ namespace BanagazonWorkforceManager.Controllers
             }
 
             var department = await _context.Department
+                .Include("Employees")
                 .SingleOrDefaultAsync(m => m.DepartmentID == id);
             if (department == null)
             {
