@@ -43,12 +43,15 @@
         <dt>
             Employee Attendees:
         </dt>
-        <dd>
+        
             @foreach (var employee in Model.EmployeeTrainingPrograms)
+            
             {
-                  @Html.DisplayNameFor(model => employee.Employee.FirstName);  
+                <dd>
+                    @Html.DisplayFor(Model => employee.Employee.FirstName)
+                </dd>
             }
-        </dd>
+                
     </dl>
 </div>
 <div>

@@ -108,9 +108,7 @@ namespace BanagazonWorkforceManager.Migrations
 
                     b.Property<int>("EmployeeID");
 
-                    b.Property<int>("TrainingID");
-
-                    b.Property<int?>("TrainingProgramID");
+                    b.Property<int>("TrainingProgramID");
 
                     b.HasKey("EmployeeTrainingID");
 
@@ -183,7 +181,8 @@ namespace BanagazonWorkforceManager.Migrations
 
                     b.HasOne("BanagazonWorkforceManager.Models.TrainingProgram", "TrainingProgram")
                         .WithMany("EmployeeTrainingPrograms")
-                        .HasForeignKey("TrainingProgramID");
+                        .HasForeignKey("TrainingProgramID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }
