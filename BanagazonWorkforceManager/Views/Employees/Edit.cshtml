@@ -1,4 +1,4 @@
-@model BanagazonWorkforceManager.Models.Employee
+@model BanagazonWorkforceManager.ViewModels.EmployeeEdit
 
 @{
     ViewData["Title"] = "Edit";
@@ -11,40 +11,67 @@
         <h4>Employee</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="EmployeeID" />
+    <input type="hidden" asp-for="Employee.EmployeeID" />
         <div class="form-group">
-            <label asp-for="FirstName" class="col-md-2 control-label"></label>
+            <label asp-for="Employee.FirstName" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <input asp-for="Employee.FirstName" class="form-control" />
+                <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="LastName" class="col-md-2 control-label"></label>
+            <label asp-for="Employee.LastName" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
+                <input asp-for="Employee.LastName" class="form-control" />
+                <span asp-validation-for="Employee.LastName" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="StartDate" class="col-md-2 control-label"></label>
+            <label asp-for="Employee.StartDate" class="col-md-2 control-label">Start Date</label>
             <div class="col-md-10">
-                <input asp-for="StartDate" class="form-control" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
+                <input asp-for="Employee.StartDate" class="form-control" />
+                <span asp-validation-for="Employee.StartDate" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="DepartmentID" class="control-label col-md-2"></label>
+            <label asp-for="Employee.DepartmentID" class="control-label col-md-2">Department</label>
             <div class="col-md-10">
-                <select asp-for="DepartmentID" class="form-control" asp-items="ViewBag.DepartmentID"></select>
-                <span asp-validation-for="DepartmentID" class="text-danger"></span>
+                <select asp-for="Employee.DepartmentID" class="form-control" asp-items="ViewBag.DepartmentID"></select>
+                <span asp-validation-for="Employee.DepartmentID" class="text-danger"></span>
             </div>
         </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">Training Programs</label>
+
+            <div class="col-md-offset-2 col-md-10">
+                <table>
+                    <tr>
+                        @{
+                            
+                            List<BanagazonWorkforceManager.ViewModels.TrainingProgramList> TrainingPrograms = ViewBag.TrainingPrograms;
+
+                            foreach (var tp in TrainingPrograms)
+                            {
+                                @: <td>
+                                    <input type="checkbox"
+                                           name="selectedTrainingPrograms"
+                                           value="@tp.TrainingProgramID"
+                                           @(Html.Raw(tp.Attending ? "checked=\"checked\"" : "")) />
+                                           @tp.Name
+                                           @:</td>
+                                               @:</tr><tr>
+                            }
+                            @:</tr>
+                        }
+                 </table>
+             </div>
+         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </div>
+
     </div>
 </form>
 

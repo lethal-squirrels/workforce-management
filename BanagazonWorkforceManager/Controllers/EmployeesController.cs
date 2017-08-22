@@ -85,13 +85,36 @@ namespace BanagazonWorkforceManager.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee.SingleOrDefaultAsync(m => m.EmployeeID == id);
-            if (employee == null)
+            EmployeeEdit viewModel = new EmployeeEdit();
+            viewModel.Employee = await _context.Employee
+                .Include(e => e.Department)
+                .Include("EmployeeComputers.Computer")
+                .Include("EmployeeTrainingPrograms.TrainingProgram")
+                .SingleOrDefaultAsync(m => m.EmployeeID == id);
+            if (viewModel.Employee == null)
             {
                 return NotFound();
             }
-            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employee.DepartmentID);
-            return View(employee);
+            PopulateTrainingProgramList(viewModel.Employee);
+            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
+            return View(viewModel);
+        }
+
+        private void PopulateTrainingProgramList(Employee employee)
+        {
+            var allTrainingPrograms =  _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).ToList();
+            var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingID));
+            var viewModel = new List<TrainingProgramList>();
+            foreach (var tp in allTrainingPrograms)
+            {
+                viewModel.Add(new TrainingProgramList
+                {
+                    TrainingProgramID = tp.TrainingProgramID,
+                    Name = tp.Name,
+                    Attending = employeesTrainingPrograms.Contains(tp.TrainingProgramID)
+                });
+            }
+            ViewData["TrainingPrograms"] = viewModel;
         }
 
         // POST: Employees/Edit/5
@@ -99,12 +122,23 @@ namespace BanagazonWorkforceManager.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeID,FirstName,LastName,StartDate,DepartmentID")] Employee employee)
+        public async Task<IActionResult> Edit(int? id, string[] selectedCourses)
         {
-            if (id != employee.EmployeeID)
+            if (id == null)
             {
                 return NotFound();
             }
+
+            var employeeToUpdate = await _context.Employee
+                .Include(e => e.Department)
+                .Include("EmployeeComputers.Computer")
+                .Include("EmployeeTrainingPrograms.TrainingProgram")
+                .SingleOrDefaultAsync(m => m.EmployeeID == id);
+
+            if (await TryUpdateModelAsync<Employee>(
+                employeeToUpdate,
+                "",
+                i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID));
 
             if (ModelState.IsValid)
             {
