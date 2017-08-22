@@ -11,7 +11,7 @@ namespace BanagazonWorkforceManager.Models
         [Required]
         public string Name { get; set; }
 
-        public ICollection<Employee> Employees;
+        public virtual ICollection<Employee> Employees { get; set; }
 
 
 

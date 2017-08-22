@@ -1,6 +1,4 @@
-
-using System;
-
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -154,7 +152,7 @@ namespace BanagazonWorkforceManager.Migrations
                         .HasForeignKey("ComputerID");
 
                     b.HasOne("BanagazonWorkforceManager.Models.Department", "Department")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("DepartmentID")
                         .OnDelete(DeleteBehavior.Cascade);
 
