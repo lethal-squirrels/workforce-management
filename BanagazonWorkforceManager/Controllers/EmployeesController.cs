@@ -97,6 +97,13 @@ namespace BanagazonWorkforceManager.Controllers
             }
             PopulateTrainingProgramList(viewModel.Employee);
             ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
+
+            var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
+            var unAssignedComps = await _context.Computer.Where(c => c.EmployeeComputers.Any(ec => ec.DateUnassigned != null)).ToListAsync();
+            var availableComps = neverAssignedComps.Union(unAssignedComps);
+            ViewData["Computer"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.Employee.Computer);
+
+
             return View(viewModel);
         }
 
