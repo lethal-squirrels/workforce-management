@@ -122,7 +122,7 @@ namespace BanagazonWorkforceManager.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, string[] selectedCourses)
+        public async Task<IActionResult> Edit(int? id, string[] selectedTrainingPrograms)
         {
             if (id == null)
             {
@@ -138,30 +138,57 @@ namespace BanagazonWorkforceManager.Controllers
             if (await TryUpdateModelAsync<Employee>(
                 employeeToUpdate,
                 "",
-                i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID));
-
-            if (ModelState.IsValid)
+                i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID))
             {
+                UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
                 try
                 {
-                    _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!EmployeeExists(employee.EmployeeID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
                 }
                 return RedirectToAction("Index");
             }
-            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employee.DepartmentID);
-            return View(employee);
+            UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
+            PopulateTrainingProgramList(employeeToUpdate);
+            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employeeToUpdate.DepartmentID);
+            return View(employeeToUpdate);
+        }
+
+        private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)
+        {
+            //if (selectedTrainingPrograms == null)
+            //{
+            //    employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
+            //    return;
+            //}
+
+            //var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
+            //var employeeTrainingPrograms = new HashSet<int>
+            //    (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
+            //foreach (var tp in _context.TrainingProgram)
+            //{
+            //    if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+            //    {
+            //        if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+            //        {
+
+            //            //Add it
+            //        }
+            //    }
+            //    else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+            //    {
+            //        if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+            //        {
+            //            //Delete it
+            //        }
+            //    }
+            //}
         }
 
         // GET: Employees/Delete/5
