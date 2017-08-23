@@ -148,6 +148,10 @@ namespace BanagazonWorkforceManager.Controllers
             {
                 _context.Computer.Remove(computer);
             }
+            else
+            {
+                return View("CantDeleteComputer");
+            }
                 await _context.SaveChangesAsync();
             
             return RedirectToAction("Index");
