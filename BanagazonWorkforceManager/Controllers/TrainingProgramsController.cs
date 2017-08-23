@@ -21,15 +21,21 @@ namespace BanagazonWorkforceManager.Controllers
         // GET: TrainingPrograms
         public async Task<IActionResult> Index()
         {
+            //Gets a list of all Training Programs
             var trainingPrograms = await _context.TrainingProgram.ToListAsync();
+            // Creates a instance of an empty list of Training Promgrams
             var futureTrainingPrograms = new List<TrainingProgram>();
+            //Loops through all Training Programs
                 foreach (var tp in trainingPrograms)
                 {
+                    // Checks to see if The Start Date is in the future
                     if (tp.StartDate.Date > DateTime.Now.Date)
                         {
+                            // Adds all future training programs to a futureTrainingProgram list
                             futureTrainingPrograms.Add(tp);
                         }
                 }
+                // Returns the list of Future Training Programs to the view
             return View(futureTrainingPrograms);
         }
 
