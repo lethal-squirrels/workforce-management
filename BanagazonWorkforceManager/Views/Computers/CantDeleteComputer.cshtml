@@ -1,0 +1,16 @@
+@model BanagazonWorkforceManager.Models.Computer
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+<h3>This Computer has already been assigned to an employee. You do not have permission to delete.</h3>
+<div>
+
+    <form asp-action="Delete">
+        <div class="form-actions no-color">|
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </form>
+</div>
