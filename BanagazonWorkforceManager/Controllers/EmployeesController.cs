@@ -162,33 +162,33 @@ namespace BanagazonWorkforceManager.Controllers
 
         private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)
         {
-            //if (selectedTrainingPrograms == null)
-            //{
-            //    employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
-            //    return;
-            //}
+            if (selectedTrainingPrograms == null)
+            {
+                employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
+                return;
+            }
 
-            //var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
-            //var employeeTrainingPrograms = new HashSet<int>
-            //    (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
-            //foreach (var tp in _context.TrainingProgram)
-            //{
-            //    if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
-            //    {
-            //        if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
-            //        {
+            var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
+            var employeeTrainingPrograms = new HashSet<int>
+                (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
+            foreach (var tp in _context.TrainingProgram)
+            {
+                if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+                {
+                    if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+                    {
 
-            //            //Add it
-            //        }
-            //    }
-            //    else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
-            //    {
-            //        if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
-            //        {
-            //            //Delete it
-            //        }
-            //    }
-            //}
+                        //Add it
+                    }
+                }
+                else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+                {
+                    if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+                    {
+                        //Delete it
+                    }
+                }
+            }
         }
 
         // GET: Employees/Delete/5
