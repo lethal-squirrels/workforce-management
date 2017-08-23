@@ -1,6 +1,4 @@
-
-using System;
-
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -110,9 +108,7 @@ namespace BanagazonWorkforceManager.Migrations
 
                     b.Property<int>("EmployeeID");
 
-                    b.Property<int>("TrainingID");
-
-                    b.Property<int?>("TrainingProgramID");
+                    b.Property<int>("TrainingProgramID");
 
                     b.HasKey("EmployeeTrainingID");
 
@@ -154,7 +150,7 @@ namespace BanagazonWorkforceManager.Migrations
                         .HasForeignKey("ComputerID");
 
                     b.HasOne("BanagazonWorkforceManager.Models.Department", "Department")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("DepartmentID")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -185,7 +181,8 @@ namespace BanagazonWorkforceManager.Migrations
 
                     b.HasOne("BanagazonWorkforceManager.Models.TrainingProgram", "TrainingProgram")
                         .WithMany("EmployeeTrainingPrograms")
-                        .HasForeignKey("TrainingProgramID");
+                        .HasForeignKey("TrainingProgramID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }

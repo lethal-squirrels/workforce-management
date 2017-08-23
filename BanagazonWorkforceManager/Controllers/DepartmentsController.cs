@@ -25,6 +25,8 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Departments/Details/5
+        //Purpose: Display list name of the department and include list of employees 
+        //Author: Madeline
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,6 +35,7 @@ namespace BanagazonWorkforceManager.Controllers
             }
 
             var department = await _context.Department
+                .Include("Employees")
                 .SingleOrDefaultAsync(m => m.DepartmentID == id);
             if (department == null)
             {
