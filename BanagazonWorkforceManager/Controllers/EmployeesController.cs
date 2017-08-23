@@ -85,13 +85,36 @@ namespace BanagazonWorkforceManager.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee.SingleOrDefaultAsync(m => m.EmployeeID == id);
-            if (employee == null)
+            EmployeeEdit viewModel = new EmployeeEdit();
+            viewModel.Employee = await _context.Employee
+                .Include(e => e.Department)
+                .Include("EmployeeComputers.Computer")
+                .Include("EmployeeTrainingPrograms.TrainingProgram")
+                .SingleOrDefaultAsync(m => m.EmployeeID == id);
+            if (viewModel.Employee == null)
             {
                 return NotFound();
             }
-            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employee.DepartmentID);
-            return View(employee);
+            PopulateTrainingProgramList(viewModel.Employee);
+            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
+            return View(viewModel);
+        }
+
+        private void PopulateTrainingProgramList(Employee employee)
+        {
+            var allTrainingPrograms =  _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).ToList();
+            var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingProgramID));
+            var viewModel = new List<TrainingProgramList>();
+            foreach (var tp in allTrainingPrograms)
+            {
+                viewModel.Add(new TrainingProgramList
+                {
+                    TrainingProgramID = tp.TrainingProgramID,
+                    Name = tp.Name,
+                    Attending = employeesTrainingPrograms.Contains(tp.TrainingProgramID)
+                });
+            }
+            ViewData["TrainingPrograms"] = viewModel;
         }
 
         // POST: Employees/Edit/5
@@ -99,35 +122,78 @@ namespace BanagazonWorkforceManager.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeID,FirstName,LastName,StartDate,DepartmentID")] Employee employee)
+        public async Task<IActionResult> Edit(int? id, string[] selectedTrainingPrograms)
         {
-            if (id != employee.EmployeeID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var employeeToUpdate = await _context.Employee
+                .Include(e => e.Department)
+                .Include("EmployeeComputers.Computer")
+                .Include("EmployeeTrainingPrograms.TrainingProgram")
+                .SingleOrDefaultAsync(m => m.EmployeeID == id);
+
+            if (await TryUpdateModelAsync<Employee>(
+                employeeToUpdate,
+                "",
+                i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID))
             {
+                UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
                 try
                 {
-                    _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!EmployeeExists(employee.EmployeeID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
                 }
                 return RedirectToAction("Index");
             }
-            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employee.DepartmentID);
-            return View(employee);
+            UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
+            PopulateTrainingProgramList(employeeToUpdate);
+            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employeeToUpdate.DepartmentID);
+            return View(employeeToUpdate);
+        }
+
+        private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)
+        {
+            if (selectedTrainingPrograms == null)
+            {
+                employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
+                return;
+            }
+
+            var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
+            var employeeTrainingPrograms = new HashSet<int>
+                (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
+            foreach (var tp in _context.TrainingProgram)
+            {
+                if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+                {
+                    if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+                    {
+                        _context.Add(new EmployeeTraining() { EmployeeID = employeeToUpdate.EmployeeID, TrainingProgramID = tp.TrainingProgramID });
+                    }
+                }
+                else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+                {
+                    if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+                    {
+                        foreach(var etp in employeeToUpdate.EmployeeTrainingPrograms)
+                        {
+                            if (etp.TrainingProgramID == tp.TrainingProgramID)
+                            {
+                                _context.Remove(etp);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // GET: Employees/Delete/5
