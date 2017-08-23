@@ -103,7 +103,7 @@ namespace BanagazonWorkforceManager.Controllers
         private void PopulateTrainingProgramList(Employee employee)
         {
             var allTrainingPrograms =  _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).ToList();
-            var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingID));
+            var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingProgramID));
             var viewModel = new List<TrainingProgramList>();
             foreach (var tp in allTrainingPrograms)
             {
@@ -177,15 +177,20 @@ namespace BanagazonWorkforceManager.Controllers
                 {
                     if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
                     {
-
-                        //Add it
+                        _context.Add(new EmployeeTraining() { EmployeeID = employeeToUpdate.EmployeeID, TrainingProgramID = tp.TrainingProgramID });
                     }
                 }
                 else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
                 {
                     if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
                     {
-                        //Delete it
+                        foreach(var etp in employeeToUpdate.EmployeeTrainingPrograms)
+                        {
+                            if (etp.TrainingProgramID == tp.TrainingProgramID)
+                            {
+                                _context.Remove(etp);
+                            }
+                        }
                     }
                 }
             }
