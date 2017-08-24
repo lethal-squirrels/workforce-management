@@ -99,11 +99,17 @@ namespace BanagazonWorkforceManager.Controllers
             ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
             var unAssignedComps = await _context.Computer.Where(c => c.EmployeeComputers.Any(ec => ec.DateUnassigned != null)).ToListAsync();
             var CurrentCompAssignment = viewModel.Employee.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
-            unAssignedComps.Add(CurrentCompAssignment.Computer);
+            if(CurrentCompAssignment != null)
+            {
+                unAssignedComps.Add(CurrentCompAssignment.Computer);
+                viewModel.SelectedComputerID = CurrentCompAssignment.ComputerID;
+            }
+           
             var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
             var availableComps = neverAssignedComps.Union(unAssignedComps);
             ViewData["Computers"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.SelectedComputerID);
-            viewModel.SelectedComputerID = CurrentCompAssignment.ComputerID;
+         
+            
             return View(viewModel);
         }
 
@@ -180,11 +186,19 @@ namespace BanagazonWorkforceManager.Controllers
         private void UpdateEmployeeComputer(int SelectedComputerID, Employee employeeToUpdate)
         {
             var CurrentCompAssignment = employeeToUpdate.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
-            employeeToUpdate.Computer = CurrentCompAssignment.Computer;
-            if (SelectedComputerID != employeeToUpdate.Computer.ComputerID)
+            if (CurrentCompAssignment != null)
+            {
+                employeeToUpdate.Computer = CurrentCompAssignment.Computer;
+                if (SelectedComputerID != employeeToUpdate.Computer.ComputerID)
+                {
+                    var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID };
+                    _context.Remove(CurrentCompAssignment);
+                    _context.Add(newAssignment);
+                }
+            }
+            else
             {
                 var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID };
-                _context.Remove(CurrentCompAssignment);
                 _context.Add(newAssignment);
             }
         }
