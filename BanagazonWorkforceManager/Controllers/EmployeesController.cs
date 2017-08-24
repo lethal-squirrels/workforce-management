@@ -188,14 +188,15 @@ namespace BanagazonWorkforceManager.Controllers
                 employeeToUpdate.Computer = CurrentCompAssignment.Computer;
                 if (SelectedComputerID != employeeToUpdate.Computer.ComputerID)
                 {
-                    var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID };
-                    _context.Remove(CurrentCompAssignment);
+                    CurrentCompAssignment.DateUnassigned = DateTime.Now;
+                    var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID, DateAssigned = DateTime.Now};
+                    _context.Update(CurrentCompAssignment);
                     _context.Add(newAssignment);
                 }
             }
             else
             {
-                var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID };
+                var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID, DateAssigned = DateTime.Now };
                 _context.Add(newAssignment);
             }
         }
