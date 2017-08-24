@@ -97,19 +97,19 @@ namespace BanagazonWorkforceManager.Controllers
             }
             PopulateTrainingProgramList(viewModel.Employee);
             ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
-
-            var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
             var unAssignedComps = await _context.Computer.Where(c => c.EmployeeComputers.Any(ec => ec.DateUnassigned != null)).ToListAsync();
+            var CurrentCompAssignment = viewModel.Employee.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
+            unAssignedComps.Add(CurrentCompAssignment.Computer);
+            var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
             var availableComps = neverAssignedComps.Union(unAssignedComps);
-            ViewData["Computer"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.Employee.Computer);
-
-
+            ViewData["Computers"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.SelectedComputerID);
+            viewModel.SelectedComputerID = CurrentCompAssignment.ComputerID;
             return View(viewModel);
         }
 
         private void PopulateTrainingProgramList(Employee employee)
         {
-            var allTrainingPrograms =  _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).ToList();
+            var allTrainingPrograms = _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).ToList();
             var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingProgramID));
             var viewModel = new List<TrainingProgramList>();
             foreach (var tp in allTrainingPrograms)
@@ -124,47 +124,69 @@ namespace BanagazonWorkforceManager.Controllers
             ViewData["TrainingPrograms"] = viewModel;
         }
 
+
+
         // POST: Employees/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, string[] selectedTrainingPrograms)
+        public async Task<IActionResult> Edit(int? id, string[] selectedTrainingPrograms, EmployeeEdit viewModel)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var employeeToUpdate = await _context.Employee
-                .Include(e => e.Department)
-                .Include("EmployeeComputers.Computer")
-                .Include("EmployeeTrainingPrograms.TrainingProgram")
-                .SingleOrDefaultAsync(m => m.EmployeeID == id);
-
-            if (await TryUpdateModelAsync<Employee>(
-                employeeToUpdate,
-                "",
-                i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID))
-            {
-                UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
+            if (ModelState.IsValid)
+            { 
                 try
                 {
+                    _context.Update(viewModel.Employee);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateException /* ex */)
+                catch (DbUpdateConcurrencyException)
                 {
-                    //Log the error (uncomment ex variable name and write a log.)
-                    ModelState.AddModelError("", "Unable to save changes. " +
-                        "Try again, and if the problem persists, " +
-                        "see your system administrator.");
+                    if (!EmployeeExists(viewModel.Employee.EmployeeID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-                return RedirectToAction("Index");
             }
+            var employeeToUpdate = await _context.Employee
+            .Include(e => e.Department)
+            .Include("EmployeeComputers.Computer")
+            .Include("EmployeeTrainingPrograms.TrainingProgram")
+            .SingleOrDefaultAsync(m => m.EmployeeID == id);
             UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
-            PopulateTrainingProgramList(employeeToUpdate);
-            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employeeToUpdate.DepartmentID);
-            return View(employeeToUpdate);
+            UpdateEmployeeComputer(viewModel.SelectedComputerID, employeeToUpdate);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //log the error (uncomment ex variable name and write a log.)
+                ModelState.AddModelError("", "unable to save changes. " +
+                    "try again, and if the problem persists, " +
+                    "see your system administrator.");
+            }
+            return RedirectToAction("Index");
+        }
+
+        private void UpdateEmployeeComputer(int SelectedComputerID, Employee employeeToUpdate)
+        {
+            var CurrentCompAssignment = employeeToUpdate.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
+            employeeToUpdate.Computer = CurrentCompAssignment.Computer;
+            if (SelectedComputerID != employeeToUpdate.Computer.ComputerID)
+            {
+                var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID };
+                _context.Remove(CurrentCompAssignment);
+                _context.Add(newAssignment);
+            }
         }
 
         private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)

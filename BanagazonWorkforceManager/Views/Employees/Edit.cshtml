@@ -42,12 +42,10 @@
         </div>
         <div class="form-group">
             <label class="col-md-2 control-label">Training Programs</label>
-
             <div class="col-md-offset-2 col-md-10">
                 <table>
                     <tr>
-                        @{
-                            
+                        @{  
                             List<BanagazonWorkforceManager.ViewModels.TrainingProgramList> TrainingPrograms = ViewBag.TrainingPrograms;
 
                             foreach (var tp in TrainingPrograms)
@@ -67,10 +65,10 @@
              </div>
          </div>
         <div class="form-group">
-            <label asp-for="Employee.Computer.ComputerID" class="control-label col-md-2">Edit Assigned Computer</label>
+            <label asp-for="SelectedComputerID" class="control-label col-md-2">Edit Assigned Computer</label>
             <div class="col-md-10">
-                <select asp-for="Computers" class="form-control" asp-items="ViewBag.Computer"></select>
-                <span asp-validation-for="Employee.Computer" class="text-danger"></span>
+                <select asp-for="SelectedComputerID" class="form-control" asp-items="ViewBag.Computers"></select>
+                <span asp-validation-for="SelectedComputerID" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
