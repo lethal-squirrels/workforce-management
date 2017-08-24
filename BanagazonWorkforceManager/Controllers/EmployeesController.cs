@@ -97,17 +97,22 @@ namespace BanagazonWorkforceManager.Controllers
             }
             PopulateTrainingProgramList(viewModel.Employee);
             ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
-            var unAssignedComps = await _context.Computer.Where(c => c.EmployeeComputers.Any(ec => ec.DateUnassigned != null)).ToListAsync();
+            var allComputers = await _context.Computer.Include("EmployeeComputers").ToListAsync();
+            var availableComputers = new List<Computer>();
+            foreach (var computer in allComputers)
+            {
+                if (!(computer.EmployeeComputers.Any(ec => ec.DateUnassigned == null)))
+                {
+                    availableComputers.Add(computer);
+                }
+            }
             var CurrentCompAssignment = viewModel.Employee.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
             if(CurrentCompAssignment != null)
             {
-                unAssignedComps.Add(CurrentCompAssignment.Computer);
+                availableComputers.Add(CurrentCompAssignment.Computer);
                 viewModel.SelectedComputerID = CurrentCompAssignment.ComputerID;
             }
-           
-            var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
-            var availableComps = neverAssignedComps.Union(unAssignedComps);
-            ViewData["Computers"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.SelectedComputerID);
+            ViewData["Computers"] = new SelectList(availableComputers, "ComputerID", "Make", viewModel.SelectedComputerID);
             return View(viewModel);
         }
 
