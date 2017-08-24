@@ -108,18 +108,17 @@ namespace BanagazonWorkforceManager.Controllers
             var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
             var availableComps = neverAssignedComps.Union(unAssignedComps);
             ViewData["Computers"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.SelectedComputerID);
-         
-            
             return View(viewModel);
         }
 
         private void PopulateTrainingProgramList(Employee employee)
         {
-            var allTrainingPrograms = _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).ToList();
+            var allTrainingPrograms = _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).Include(m => m.EmployeeTrainingPrograms).ToList();
             var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingProgramID));
             var viewModel = new List<TrainingProgramList>();
             foreach (var tp in allTrainingPrograms)
             {
+                if(!(tp.EmployeeTrainingPrograms.Count >= tp.MaxAttendees) || employeesTrainingPrograms.Contains(tp.TrainingProgramID))
                 viewModel.Add(new TrainingProgramList
                 {
                     TrainingProgramID = tp.TrainingProgramID,
@@ -129,8 +128,6 @@ namespace BanagazonWorkforceManager.Controllers
             }
             ViewData["TrainingPrograms"] = viewModel;
         }
-
-
 
         // POST: Employees/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
