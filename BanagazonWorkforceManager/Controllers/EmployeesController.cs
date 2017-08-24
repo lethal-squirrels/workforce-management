@@ -100,8 +100,23 @@ namespace BanagazonWorkforceManager.Controllers
 
             var neverAssignedComps = await _context.Computer.Where(c => !_context.EmployeeComputer.Select(ec => ec.ComputerID ).Contains(c.ComputerID)).ToListAsync();
             var unAssignedComps = await _context.Computer.Where(c => c.EmployeeComputers.Any(ec => ec.DateUnassigned != null)).ToListAsync();
+            var employeeCurrentComputer = await _context.Computer.Where(c => c.ComputerID == id).ToListAsync();
             var availableComps = neverAssignedComps.Union(unAssignedComps);
-            ViewData["Computer"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.Employee.Computer);
+            var employeeComputerList = _context.EmployeeComputer.ToList();
+            foreach(var computer in employeeComputerList)
+            {
+                if (computer.DateUnassigned == null && computer.EmployeeID == id)
+                {
+                    viewModel.ComputerID = computer.ComputerID;
+                    viewModel.OldComputerID = computer.ComputerID;
+                    viewModel.OldDateAssigned = computer.DateAssigned;
+                    viewModel.OldEmployeeComputerID = computer.EmployeeComputerID;
+                }
+            }
+            availableComps = availableComps.Concat(employeeCurrentComputer);
+            
+            // grab selected computer
+            ViewData["ComputerID"] = new SelectList(availableComps, "ComputerID", "Make", viewModel.ComputerID);
 
 
             return View(viewModel);
@@ -124,84 +139,143 @@ namespace BanagazonWorkforceManager.Controllers
             ViewData["TrainingPrograms"] = viewModel;
         }
 
-        // POST: Employees/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, string[] selectedTrainingPrograms)
+        public async Task<IActionResult> Edit(int id, EmployeeEdit employeeEdit)
         {
-            if (id == null)
+            EmployeeComputer newEmployeeComputer = new EmployeeComputer()
+            {
+                ComputerID = employeeEdit.ComputerID,
+                EmployeeID = id,
+                DateAssigned = DateTime.Now
+            };
+
+            EmployeeComputer oldEmployeeComputer = new EmployeeComputer()
+            {
+                EmployeeComputerID = employeeEdit.OldEmployeeComputerID,
+                ComputerID = employeeEdit.OldComputerID,
+                EmployeeID = id,
+                DateAssigned = employeeEdit.OldDateAssigned,
+                DateUnassigned = DateTime.Now
+            };
+
+
+
+            if (id != employeeEdit.Employee.EmployeeID)
             {
                 return NotFound();
             }
 
-            var employeeToUpdate = await _context.Employee
-                .Include(e => e.Department)
-                .Include("EmployeeComputers.Computer")
-                .Include("EmployeeTrainingPrograms.TrainingProgram")
-                .SingleOrDefaultAsync(m => m.EmployeeID == id);
-
-            if (await TryUpdateModelAsync<Employee>(
-                employeeToUpdate,
-                "",
-                i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID))
+            if (ModelState.IsValid)
             {
-                UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
                 try
                 {
+                    _context.Update(employeeEdit.Employee);
+                    await _context.SaveChangesAsync();
+                    _context.EmployeeComputer.Add(newEmployeeComputer);
+                    await _context.SaveChangesAsync();
+                    _context.EmployeeComputer.Update(oldEmployeeComputer);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateException /* ex */)
+                catch (DbUpdateConcurrencyException)
                 {
-                    //Log the error (uncomment ex variable name and write a log.)
-                    ModelState.AddModelError("", "Unable to save changes. " +
-                        "Try again, and if the problem persists, " +
-                        "see your system administrator.");
+                    if (!EmployeeExists(employeeEdit.Employee.EmployeeID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction("Index");
             }
-            UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
-            PopulateTrainingProgramList(employeeToUpdate);
-            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employeeToUpdate.DepartmentID);
-            return View(employeeToUpdate);
+            ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employeeEdit.Employee.DepartmentID);
+            return View(employeeEdit.Employee);
         }
+        //// POST: Employees/Edit/5
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int? id, string[] selectedTrainingPrograms, [Bind("Employee.Computer")] EmployeeComputer eComputer)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-        private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)
-        {
-            if (selectedTrainingPrograms == null)
-            {
-                employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
-                return;
-            }
+        //    var employeeToUpdate = await _context.Employee
+        //        .Include(e => e.Department)
+        //        .Include("EmployeeComputers.Computer")
+        //        .Include("EmployeeTrainingPrograms.TrainingProgram")
+        //        .SingleOrDefaultAsync(m => m.EmployeeID == id);
 
-            var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
-            var employeeTrainingPrograms = new HashSet<int>
-                (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
-            foreach (var tp in _context.TrainingProgram)
-            {
-                if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
-                {
-                    if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
-                    {
-                        _context.Add(new EmployeeTraining() { EmployeeID = employeeToUpdate.EmployeeID, TrainingProgramID = tp.TrainingProgramID });
-                    }
-                }
-                else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
-                {
-                    if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
-                    {
-                        foreach(var etp in employeeToUpdate.EmployeeTrainingPrograms)
-                        {
-                            if (etp.TrainingProgramID == tp.TrainingProgramID)
-                            {
-                                _context.Remove(etp);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //    if (await TryUpdateModelAsync<Employee>(
+        //        employeeToUpdate,
+        //        "",
+        //        i => i.FirstName, i => i.LastName, i => i.StartDate, i => i.DepartmentID))
+        //    {
+        //        UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
+        //        try
+        //        {
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateException /* ex */)
+        //        {
+        //            //Log the error (uncomment ex variable name and write a log.)
+        //            ModelState.AddModelError("", "Unable to save changes. " +
+        //                "Try again, and if the problem persists, " +
+        //                "see your system administrator.");
+        //        }
+        //        return RedirectToAction("Index");
+        //    }
+        //    UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
+        //    PopulateTrainingProgramList(employeeToUpdate);
+
+        //    ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", employeeToUpdate.DepartmentID);
+
+        //    //_context.Update<EmployeeComputer>();
+        //    //await _context.SaveChangesAsync();
+
+        //    return View(employeeToUpdate);
+        //}
+
+        //private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)
+        //{
+        //    if (selectedTrainingPrograms == null)
+        //    {
+        //        employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
+        //        return;
+        //    }
+
+        //    var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
+        //    var employeeTrainingPrograms = new HashSet<int>
+        //        (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
+        //    foreach (var tp in _context.TrainingProgram)
+        //    {
+        //        if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+        //        {
+        //            if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+        //            {
+        //                _context.Add(new EmployeeTraining() { EmployeeID = employeeToUpdate.EmployeeID, TrainingProgramID = tp.TrainingProgramID });
+        //            }
+        //        }
+        //        else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
+        //        {
+        //            if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
+        //            {
+        //                foreach(var etp in employeeToUpdate.EmployeeTrainingPrograms)
+        //                {
+        //                    if (etp.TrainingProgramID == tp.TrainingProgramID)
+        //                    {
+        //                        _context.Remove(etp);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)

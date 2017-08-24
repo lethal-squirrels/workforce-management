@@ -40,6 +40,16 @@
                 <span asp-validation-for="Employee.DepartmentID" class="text-danger"></span>
             </div>
         </div>
+        <input type="hidden" asp-for="OldComputerID" />
+        <input type="hidden" asp-for="OldEmployeeComputerID" />
+        <input type="hidden" asp-for="OldDateAssigned" />
+        <div class="form-group">
+            <label asp-for="ComputerID" class="control-label col-md-2">Edit Assigned Computer</label>
+            <div class="col-md-10">
+                <select asp-for="ComputerID" class="form-control" asp-items="ViewBag.ComputerID"></select>
+                <span asp-validation-for="ComputerID" class="text-danger"></span>
+            </div>
+        </div>
         <div class="form-group">
             <label class="col-md-2 control-label">Training Programs</label>
 
@@ -66,13 +76,6 @@
                  </table>
              </div>
          </div>
-        <div class="form-group">
-            <label asp-for="Employee.Computer.ComputerID" class="control-label col-md-2">Edit Assigned Computer</label>
-            <div class="col-md-10">
-                <select asp-for="Computers" class="form-control" asp-items="ViewBag.Computer"></select>
-                <span asp-validation-for="Employee.Computer" class="text-danger"></span>
-            </div>
-        </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />

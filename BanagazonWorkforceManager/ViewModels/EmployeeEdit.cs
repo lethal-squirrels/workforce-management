@@ -10,9 +10,15 @@ namespace BanagazonWorkforceManager.ViewModels
     public class EmployeeEdit
     {
         public Employee Employee { get; set; }
-        public IEnumerable<TrainingProgram> SelectedTrainingPrograms { get; set; }
-        public IEnumerable<Department> Departments { get; set; }
-        public IEnumerable<Computer> Computers { get; set; }
-        public IEnumerable<SelectListItem> TrainingPrograms { get; set; }
+        
+        public int ComputerID { get; set; }
+
+        public int OldComputerID { get; set; }
+
+        public int OldEmployeeComputerID { get; set; }
+
+        public DateTime OldDateAssigned { get; set; }
+
+        public int TrainingProgramID { get; set; }
     }
 }
