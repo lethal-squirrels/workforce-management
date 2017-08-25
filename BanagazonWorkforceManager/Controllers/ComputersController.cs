@@ -141,6 +141,7 @@ namespace BanagazonWorkforceManager.Controllers
             var computer = await _context.Computer
                 .SingleOrDefaultAsync(m => m.ComputerID == id);
 
+
             var computerHasBeenAssigned = await _context.EmployeeComputer
               .AnyAsync(m => m.ComputerID == id);
 
