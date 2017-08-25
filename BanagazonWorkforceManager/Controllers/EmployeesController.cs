@@ -85,20 +85,28 @@ namespace BanagazonWorkforceManager.Controllers
                 return NotFound();
             }
 
+            // Creates a new instance of the EmployeeEdit view model
             EmployeeEdit viewModel = new EmployeeEdit();
+            // Grabs the Current Employee and Attatches Computer and TrainingProgram Tables
             viewModel.Employee = await _context.Employee
                 .Include(e => e.Department)
                 .Include("EmployeeComputers.Computer")
                 .Include("EmployeeTrainingPrograms.TrainingProgram")
                 .SingleOrDefaultAsync(m => m.EmployeeID == id);
+            // Makes Sure the Employee is Actually There
             if (viewModel.Employee == null)
             {
                 return NotFound();
             }
+            // Calls the PopulateTrainingProgramList Method, The current Employee is passed in as an argument
             PopulateTrainingProgramList(viewModel.Employee);
+            // Creates a new Select List that will Allow you to Select a different department in the view
             ViewData["DepartmentID"] = new SelectList(_context.Set<Department>(), "DepartmentID", "Name", viewModel.Employee.DepartmentID);
+            // Grabs all Computers and attatches EmployeeComputers Join Table
             var allComputers = await _context.Computer.Include("EmployeeComputers").ToListAsync();
+            // Creates a new instance of a list of computers
             var availableComputers = new List<Computer>();
+            // Loops Over all Computers and only adds the available computers that are unassagined
             foreach (var computer in allComputers)
             {
                 if (!(computer.EmployeeComputers.Any(ec => ec.DateUnassigned == null)))
@@ -106,21 +114,28 @@ namespace BanagazonWorkforceManager.Controllers
                     availableComputers.Add(computer);
                 }
             }
+            // Grabs the current Employees Computer
             var CurrentCompAssignment = viewModel.Employee.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
+            // If The current Employee has a computer, it is added to the available computer list and the computer ID is attached to the view model
             if(CurrentCompAssignment != null)
             {
                 availableComputers.Add(CurrentCompAssignment.Computer);
                 viewModel.SelectedComputerID = CurrentCompAssignment.ComputerID;
             }
+            // Creates a new select list with the available computers
             ViewData["Computers"] = new SelectList(availableComputers, "ComputerID", "Make", viewModel.SelectedComputerID);
             return View(viewModel);
         }
 
+        // A method to populate the The Training Program List, takes an argument of the current Employee
         private void PopulateTrainingProgramList(Employee employee)
         {
+            // Grabs all training programs that are in the future
             var allTrainingPrograms = _context.TrainingProgram.Where(m => m.StartDate > DateTime.Today).Include(m => m.EmployeeTrainingPrograms).ToList();
+            // Creates a Hashset that contains all the future training program IDs
             var employeesTrainingPrograms = new HashSet<int>(employee.EmployeeTrainingPrograms.Select(c => c.TrainingProgramID));
             var viewModel = new List<TrainingProgramList>();
+            // Loops over all training programs and adds the training program to a list if the max attendence had not been met or it has already been selected
             foreach (var tp in allTrainingPrograms)
             {
                 if(!(tp.EmployeeTrainingPrograms.Count >= tp.MaxAttendees) || employeesTrainingPrograms.Contains(tp.TrainingProgramID))
@@ -131,6 +146,7 @@ namespace BanagazonWorkforceManager.Controllers
                     Attending = employeesTrainingPrograms.Contains(tp.TrainingProgramID)
                 });
             }
+            // Attached the viewModel to the Scope
             ViewData["TrainingPrograms"] = viewModel;
         }
 
@@ -169,7 +185,9 @@ namespace BanagazonWorkforceManager.Controllers
             .Include("EmployeeComputers.Computer")
             .Include("EmployeeTrainingPrograms.TrainingProgram")
             .SingleOrDefaultAsync(m => m.EmployeeID == id);
+            // Calls method to update current Employee training programs -- takes argument of selectedTrainingPrograms(checked in the view) and the curent employee
             UpdateEmployeeTrainingPrograms(selectedTrainingPrograms, employeeToUpdate);
+            // Calls method to update current Emloyee Computer -- takes an argument of The selected ComputerID and the cuurent Employee
             UpdateEmployeeComputer(viewModel.SelectedComputerID, employeeToUpdate);
             try
             {
@@ -184,14 +202,16 @@ namespace BanagazonWorkforceManager.Controllers
             }
             return RedirectToAction("Index");
         }
-
+        // Calls method to update current Emloyee Computer -- takes an argument of The selected ComputerID and the cuurent Employee
         private void UpdateEmployeeComputer(int SelectedComputerID, Employee employeeToUpdate)
         {
+            // Grabs the current EmployeeComputer
             var CurrentCompAssignment = employeeToUpdate.EmployeeComputers.SingleOrDefault(m => m.DateUnassigned == null);
+            // If the Employee has an Active Computer -->
             if (CurrentCompAssignment != null)
             {
-                employeeToUpdate.Computer = CurrentCompAssignment.Computer;
-                if (SelectedComputerID != employeeToUpdate.Computer.ComputerID)
+                // If the newly selected ComputerID is not the current ComputerID Update the DateUnassigned and add a new row in the EmployeeComputer table
+                if (SelectedComputerID != CurrentCompAssignment.Computer.ComputerID)
                 {
                     CurrentCompAssignment.DateUnassigned = DateTime.Now;
                     var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID, DateAssigned = DateTime.Now};
@@ -199,6 +219,7 @@ namespace BanagazonWorkforceManager.Controllers
                     _context.Add(newAssignment);
                 }
             }
+            // If the Employee does not have an active computer, add the new computer to the EmployeeComputer Table
             else
             {
                 var newAssignment = new EmployeeComputer() { EmployeeID = employeeToUpdate.EmployeeID, ComputerID = SelectedComputerID, DateAssigned = DateTime.Now };
@@ -206,19 +227,18 @@ namespace BanagazonWorkforceManager.Controllers
             }
         }
 
+        // Method to update current Employee training programs -- takes argument of selectedTrainingPrograms(checked in the view) and the curent employee
         private void UpdateEmployeeTrainingPrograms(string[] selectedTrainingPrograms, Employee employeeToUpdate)
         {
-            if (selectedTrainingPrograms == null)
-            {
-                employeeToUpdate.EmployeeTrainingPrograms = new List<EmployeeTraining>();
-                return;
-            }
-
+            // creates a hashset of training program IDs that were selected in the view
             var selectedTrainingProgramsHS = new HashSet<string>(selectedTrainingPrograms);
+            // creates a hashset of training program IDs that were previously attached to the current employee
             var employeeTrainingPrograms = new HashSet<int>
                 (employeeToUpdate.EmployeeTrainingPrograms.Select(e => e.TrainingProgram.TrainingProgramID));
+            // Loops over all training programs
             foreach (var tp in _context.TrainingProgram)
             {
+                // If they selected a training program, but the employee is not currently signed up, Add the new training program to the EmployeeTraining Table
                 if (selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
                 {
                     if (!employeeTrainingPrograms.Contains(tp.TrainingProgramID))
@@ -226,6 +246,7 @@ namespace BanagazonWorkforceManager.Controllers
                         _context.Add(new EmployeeTraining() { EmployeeID = employeeToUpdate.EmployeeID, TrainingProgramID = tp.TrainingProgramID });
                     }
                 }
+                // If they unselected a training program that they were currently enrolled in, remove the row from the EmlpoyeeTraining Table
                 else if (employeeTrainingPrograms.Contains(tp.TrainingProgramID))
                 {
                     if (!selectedTrainingProgramsHS.Contains(tp.TrainingProgramID.ToString()))
