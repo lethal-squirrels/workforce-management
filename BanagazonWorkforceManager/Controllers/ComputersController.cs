@@ -141,12 +141,13 @@ namespace BanagazonWorkforceManager.Controllers
             var computer = await _context.Computer
                 .SingleOrDefaultAsync(m => m.ComputerID == id);
 
-            var computer_assigned = await _context.EmployeeComputer
-              .SingleOrDefaultAsync(m => m.ComputerID == id);
+            var computerHasBeenAssigned = await _context.EmployeeComputer
+              .AnyAsync(m => m.ComputerID == id);
 
-            if (computer_assigned == null)
+            if (!computerHasBeenAssigned)
             {
                 _context.Computer.Remove(computer);
+                await _context.SaveChangesAsync();
             }
             else
             {
