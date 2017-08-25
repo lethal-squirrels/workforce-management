@@ -19,6 +19,7 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Departments
+        //Returns a list of all departments and passes them to the index view. 
         public async Task<IActionResult> Index()
         {
             return View(await _context.Department.ToListAsync());
@@ -46,6 +47,7 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Departments/Create
+        //Displays form to create a new Department.
         public IActionResult Create()
         {
             return View();
@@ -54,6 +56,7 @@ namespace BanagazonWorkforceManager.Controllers
         // POST: Departments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //Binds info from the create form to a new department instance and adds the row in the database 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DepartmentID,Name")] Department department)
@@ -68,6 +71,7 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Departments/Edit/5
+        //Retreives a department based on departmentID and displays it in the edit view
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +90,7 @@ namespace BanagazonWorkforceManager.Controllers
         // POST: Departments/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //Takes the information fom the edit form and binds it to the instabce od department ot be edited and updates that row in the database
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("DepartmentID,Name")] Department department)
@@ -119,6 +124,7 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Departments/Delete/5
+        //Captures a department based on id and displays it in the delete view 
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +143,7 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // POST: Departments/Delete/5
+        //runs the delete action on the selected department
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
