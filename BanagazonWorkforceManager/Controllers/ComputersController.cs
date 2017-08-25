@@ -19,15 +19,12 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Computers
-        //Gets list of all computers in the Computers table
         public async Task<IActionResult> Index()
         {
             return View(await _context.Computer.ToListAsync());
         }
 
         // GET: Computers/Details/5
-        //Gets computer based off ID and passes it to the details view 
-
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,7 +43,6 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Computers/Create
-        //Returns the view for the create form
         public IActionResult Create()
         {
             return View();
@@ -55,8 +51,6 @@ namespace BanagazonWorkforceManager.Controllers
         // POST: Computers/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-
-        //Method for posting a created computer. Binds info from form to a new instance of Computer and posts it to create a new row. 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ComputerID,Make,Manufacturer,DatePurchased")] Computer computer)
@@ -71,7 +65,6 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Computers/Edit/5
-        //Grabs info for a computer based on ID and passes to edit view
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,7 +83,6 @@ namespace BanagazonWorkforceManager.Controllers
         // POST: Computers/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //Binds your edits to the computer instance and passes it in to be updated
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ComputerID,Make,Manufacturer,DatePurchased")] Computer computer)
@@ -124,7 +116,6 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // GET: Computers/Delete/5
-        //Gets computer based on ID to delete. 
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -143,13 +134,13 @@ namespace BanagazonWorkforceManager.Controllers
         }
 
         // POST: Computers/Delete/5
-        //If a computer has ever been used (assigned to an employee) you are redirected to a screen that informs you that it cannot be deleted. 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var computer = await _context.Computer
                 .SingleOrDefaultAsync(m => m.ComputerID == id);
+
 
             var computerHasBeenAssigned = await _context.EmployeeComputer
               .AnyAsync(m => m.ComputerID == id);
