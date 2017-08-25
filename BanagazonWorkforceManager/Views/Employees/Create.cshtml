@@ -26,14 +26,14 @@
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="StartDate" class="col-md-2 control-label"></label>
+            <label asp-for="StartDate" class="col-md-2 control-label">Start Date</label>
             <div class="col-md-10">
                 <input asp-for="StartDate" class="form-control" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
+            <label asp-for="DepartmentID" class="col-md-2 control-label">Department</label>
             <div class="col-md-10">
                 <select asp-for="DepartmentID" class ="form-control" asp-items="ViewBag.DepartmentID"></select>
             </div>

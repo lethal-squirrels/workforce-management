@@ -23,7 +23,7 @@
             @Html.DisplayFor(model => model.LastName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.StartDate)
+            Start Date
         </dt>
         <dd>
             @Html.DisplayFor(model => model.StartDate)
@@ -38,16 +38,14 @@
             @Html.DisplayNameFor(model => model.EmployeeComputers)
         </dt>
         <dd>
-            @*the include in our context brought in a list of all computers assigned to an employee
-            to make out selection - we need to loop over all the assigned computers in the EmployeeComputer join table
-            and only display the computer that does not have a DateUnassigned value*@
+            
 
            @foreach (var item in Model.EmployeeComputers)
            {
                @if (item.DateUnassigned == null)
                {
 
-               @Html.DisplayFor(Model => item.Computer.Make)
+               @Html.DisplayFor(Model => item.Computer.Manufacturer) @: @Html.DisplayFor(Model => item.Computer.Make)
                }
            }
         </dd>

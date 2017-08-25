@@ -8,7 +8,7 @@
 
 <form asp-action="Create">
     <div class="form-horizontal">
-        <h4>TrainingProgram</h4>
+        <h4>Training Program</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
@@ -26,21 +26,21 @@
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="StartDate" class="col-md-2 control-label"></label>
+            <label asp-for="StartDate" class="col-md-2 control-label">Start Date</label>
             <div class="col-md-10">
                 <input asp-for="StartDate" class="form-control" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="EndDate" class="col-md-2 control-label"></label>
+            <label asp-for="EndDate" class="col-md-2 control-label">End Date</label>
             <div class="col-md-10">
                 <input asp-for="EndDate" class="form-control" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="MaxAttendees" class="col-md-2 control-label"></label>
+            <label asp-for="MaxAttendees" class="col-md-2 control-label">Max Attendees</label>
             <div class="col-md-10">
                 <input asp-for="MaxAttendees" class="form-control" />
                 <span asp-validation-for="MaxAttendees" class="text-danger"></span>
