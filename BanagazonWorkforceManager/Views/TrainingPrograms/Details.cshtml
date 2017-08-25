@@ -23,19 +23,19 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.StartDate)
+            Start Date
         </dt>
         <dd>
             @Html.DisplayFor(model => model.StartDate)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.EndDate)
+            End Date
         </dt>
         <dd>
             @Html.DisplayFor(model => model.EndDate)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.MaxAttendees)
+            Max Attendees
         </dt>
         <dd>
             @Html.DisplayFor(model => model.MaxAttendees)
@@ -45,10 +45,9 @@
         </dt>
         
             @foreach (var employee in Model.EmployeeTrainingPrograms)
-            
             {
                 <dd>
-                    @Html.DisplayFor(Model => employee.Employee.FirstName)
+                    @Html.DisplayFor(Model => employee.Employee.FirstName) @Html.DisplayFor(Model => employee.Employee.LastName)
                 </dd>
             }
                 
